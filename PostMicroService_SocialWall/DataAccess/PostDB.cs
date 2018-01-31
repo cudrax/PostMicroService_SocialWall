@@ -33,6 +33,11 @@ namespace PostMicroService_SocialWall.DataAccess
             return retVal;
         }
 
+        //private static int ReadId(SqlDataReader reader)
+        //{
+        //    return (int)reader["Id"];
+        //}
+
         private static string AllColumnSelect
         {
             get
@@ -54,6 +59,7 @@ namespace PostMicroService_SocialWall.DataAccess
         private static void FillData(SqlCommand command, Post post)
         {
             //command.AddParameter("@Id", SqlDbType.Int, post.Id);
+            command.AddParameter("@Created", SqlDbType.DateTime, post.Created);
             command.AddParameter("@Text", SqlDbType.NVarChar, post.Text);
             command.AddParameter("@Attachment", SqlDbType.VarBinary, post.Attachment);
             command.AddParameter("@Location", SqlDbType.NVarChar, post.Location);
