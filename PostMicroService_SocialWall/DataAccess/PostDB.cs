@@ -1,14 +1,14 @@
-﻿using PostMicroService_SocialWall.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using URISUtil.DataAccess;
 using System.Linq;
 using System.Web;
 using System.Data;
+using System.Data.SqlClient;
+using PostMicroService_SocialWall.Models;
+using System.Net;
+using URISUtil.DataAccess;
 using URISUtil.Logging;
 using URISUtil.Response;
-using System.Net;
 
 namespace PostMicroService_SocialWall.DataAccess
 {
@@ -16,27 +16,22 @@ namespace PostMicroService_SocialWall.DataAccess
     {
         private static Post ReadRow(SqlDataReader reader)
         {
-            Post retVal = new Post()
-            {
-                Id = (int)reader["Id"],
-                Created = (DateTime)reader["Created"],
-                Text = reader["Text"] as string,
-                Attachment = (byte[])reader["Attachment"],
-                Location = reader["Location"] as string,
-                Rating = (decimal)reader["Rating"],
-                Clicks = (int)reader["Clicks"],
+            Post retVal = new Post();
 
-                Active = (bool)reader["Active"],
+            retVal.Id = (int)reader["Id"];
+            retVal.Created = (DateTime)reader["Created"];
+            retVal.Text = (string)reader["Text"];
+            retVal.Attachment = (byte[])reader["Attachment"];
+            retVal.Location = (string)reader["Location"];
+            retVal.Rating = (decimal)reader["Rating"];
+            retVal.Clicks = (int)reader["Clicks"];
 
-                UserId = (int)reader["UserId"]
-            };
+            retVal.Active = (bool)reader["Active"];
+            retVal.UserId = (int)reader["UserId"];
+
+
             return retVal;
         }
-
-        //private static int ReadId(SqlDataReader reader)
-        //{
-        //    return (int)reader["Id"];
-        //}
 
         private static string AllColumnSelect
         {
@@ -58,16 +53,17 @@ namespace PostMicroService_SocialWall.DataAccess
 
         private static void FillData(SqlCommand command, Post post)
         {
-            //command.AddParameter("@Id", SqlDbType.Int, post.Id);
             command.AddParameter("@Created", SqlDbType.DateTime, post.Created);
             command.AddParameter("@Text", SqlDbType.NVarChar, post.Text);
             command.AddParameter("@Attachment", SqlDbType.VarBinary, post.Attachment);
             command.AddParameter("@Location", SqlDbType.NVarChar, post.Location);
-            command.AddParameter("@Rating", SqlDbType.Decimal, post.Rating);
+            command.AddParameter("Rating", SqlDbType.Decimal, post.Rating);
             command.AddParameter("@Clicks", SqlDbType.Int, post.Clicks);
             command.AddParameter("@Active", SqlDbType.Bit, post.Active);
             command.AddParameter("@UserId", SqlDbType.Int, post.UserId);
+
         }
+
 
         public static List<Post> GetPosts(ActiveStatusEnum active)
         {
@@ -79,7 +75,7 @@ namespace PostMicroService_SocialWall.DataAccess
                     SqlCommand command = connection.CreateCommand();
                     command.CommandText = String.Format(@"
                         SELECT {0} FROM [dbo].[Post] 
-                        WHERE @Active IS NULL OR [dbo].[Post].Active = @Active
+                        WHERE @Active IS NULL OR [dbo].[Post].active = @Active
                         ", AllColumnSelect);
 
                     command.Parameters.Add("@Active", SqlDbType.Bit);
@@ -130,7 +126,7 @@ namespace PostMicroService_SocialWall.DataAccess
                     ", AllColumnSelect);
                     command.AddParameter("@Id", SqlDbType.Int, Id);
 
-                    System.Diagnostics.Debug.WriteLine(command.CommandText);
+                    //System.Diagnostics.Debug.WriteLine(command.CommandText);
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -163,7 +159,7 @@ namespace PostMicroService_SocialWall.DataAccess
                 {
                     SqlCommand command = connection.CreateCommand();
                     command.CommandText = @"
-                        INSERT INTO [post].[Post]
+                        INSERT INTO [dbo].[Post]
                         (
                             [Created],
                             [Text],
@@ -172,7 +168,7 @@ namespace PostMicroService_SocialWall.DataAccess
                             [Rating],
                             [Clicks],
                             [Active],
-                            [UserId]                
+                            [UserId]       
                         )
                         VALUES
                         (
@@ -185,6 +181,11 @@ namespace PostMicroService_SocialWall.DataAccess
                             @Active,
                             @UserId
                         )";
+
+                    //posle zagrade
+                    /*  SET @Id = SCOPE_IDENTITY();
+                       SELECT @Id as Id*/
+                    //ima lik jos nesto
                     FillData(command, post);
                     if (post.Attachment == null)
                         if (post.Text == null || post.Text == "")
@@ -199,11 +200,13 @@ namespace PostMicroService_SocialWall.DataAccess
             catch (Exception ex)
             {
                 Logger.WriteLog(ex);
-                throw ErrorResponse.ErrorMessage(HttpStatusCode.BadRequest, ex);
+                throw ErrorResponse.ErrorMessage(System.Net.HttpStatusCode.BadRequest, ex);
             }
         }
 
-        public static Post UpdatePost(Post post, int id)
+
+
+        public static Post UpdatePost(Post post, int id)//, Guid id)
         {
             try
             {
@@ -216,10 +219,8 @@ namespace PostMicroService_SocialWall.DataAccess
                         SET
                             [Text] = @Text,
                             [Attachment] = @Attachment,
-                            [Location] = @Location,
-                            [Rating] = @Rating,
-                            [Clicks] = @Clicks,
-                            [Active] = @Active
+                            [Active] = @Active,
+                            [Clicks] = @Clicks                
                         WHERE
                             [Id] = @Id
                     ");
@@ -241,7 +242,7 @@ namespace PostMicroService_SocialWall.DataAccess
             }
         }
 
-        public static void DeletePost(int id)
+        public static void DeletePost(int Id)
         {
             try
             {
@@ -254,9 +255,9 @@ namespace PostMicroService_SocialWall.DataAccess
                         SET
                             [active] = 0
                         WHERE
-                            [id] = @Id     
+                            [Id] = @Id     
                     ");
-                    command.AddParameter("@Id", SqlDbType.Int, id);
+                    command.AddParameter("@Id", SqlDbType.Int, Id);
                     connection.Open();
                     command.ExecuteNonQuery();
 
