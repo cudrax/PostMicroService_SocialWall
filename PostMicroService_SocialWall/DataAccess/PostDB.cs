@@ -53,6 +53,7 @@ namespace PostMicroService_SocialWall.DataAccess
 
         private static void FillData(SqlCommand command, Post post)
         {
+            //command.AddParameter("@Id", SqlDbType.Int, post.Id);
             command.AddParameter("@Created", SqlDbType.DateTime, post.Created);
             command.AddParameter("@Text", SqlDbType.NVarChar, post.Text);
             command.AddParameter("@Attachment", SqlDbType.VarBinary, post.Attachment);
@@ -125,8 +126,7 @@ namespace PostMicroService_SocialWall.DataAccess
                         WHERE [id] = @Id
                     ", AllColumnSelect);
                     command.AddParameter("@Id", SqlDbType.Int, Id);
-
-                    //System.Diagnostics.Debug.WriteLine(command.CommandText);
+                    
                     connection.Open();
 
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -182,10 +182,6 @@ namespace PostMicroService_SocialWall.DataAccess
                             @UserId
                         )";
 
-                    //posle zagrade
-                    /*  SET @Id = SCOPE_IDENTITY();
-                       SELECT @Id as Id*/
-                    //ima lik jos nesto
                     FillData(command, post);
                     if (post.Attachment == null)
                         if (post.Text == null || post.Text == "")
@@ -206,7 +202,7 @@ namespace PostMicroService_SocialWall.DataAccess
 
 
 
-        public static Post UpdatePost(Post post, int id)//, Guid id)
+        public static Post UpdatePost(Post post, int id)
         {
             try
             {

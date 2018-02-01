@@ -53,27 +53,11 @@ namespace PostMicroService_SocialWall.Tests
             int oldNumberOfPosts = PostDB.GetPosts(active).Count;
             PostDB.InsertPost(post);
             Assert.AreEqual(oldNumberOfPosts + 1, PostDB.GetPosts(active).Count);
-            //Assert.AreEqual(1, PostDB.GetPosts(active).Count);
         }
 
         [Test]
         public void InsertPostFailed()
         {
-            /*Post post = new Post
-            {
-                Created = new DateTime(2018, 3, 3, 5, 0, 0),
-                Text = "Danas pravimo microservice",
-                Attachment = Encoding.ASCII.GetBytes("slika"),
-                Location = "Novi sad",
-                Rating = 3.2m,
-                Clicks = 7,
-                Active = true,
-                UserId = 1
-            };
-            int oldNumberOfPosts = PostDB.GetAllPosts(active).Count;
-            PostDB.InsertPostManualId(post);
-            Assert.AreEqual(oldNumberOfPosts, PostDB.GetAllPosts(active).Count);
-            */
             Assert.AreEqual(1, 1);
         }
 
@@ -98,12 +82,7 @@ namespace PostMicroService_SocialWall.Tests
 
             PostDB.UpdatePost(post, id);
             Post updatedPost = PostDB.GetPost(id);
-
             Assert.AreEqual(updatedPost.Text, post.Text);
-            /*Assert.AreEqual(updatedPost.Clicks, post.Clicks);
-            Assert.AreEqual(updatedPost.Attachment, post.Attachment);
-            Assert.AreEqual(updatedPost.Active, post.Active);
-            Assert.AreEqual(updatedPost.UserId, post.UserId);*/
 
 
         }
