@@ -1,5 +1,6 @@
 ﻿using PostMicroService_SocialWall.DataAccess;
 using PostMicroService_SocialWall.Models;
+using PostMicroService_SocialWall.ServiceCalls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,5 +42,12 @@ namespace PostMicroService_SocialWall.Controllers
         {
             PostDB.DeletePost(id);
         }
+
+        [Route("api/User/{id}"), HttpGet]
+        public User GetUser(int id)
+        {
+            return UserService.GetUser(id);
+        }
+
     }
 }
